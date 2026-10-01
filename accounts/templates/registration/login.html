@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — CareerDNA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0B0F19] text-slate-200 font-sans min-h-screen flex items-center justify-center p-6">
+
+    <div class="fixed top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-indigo-900/20 blur-[150px] pointer-events-none"></div>
+
+    <div class="w-full max-w-md bg-[#151D30]/60 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 relative z-10">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-extrabold text-white mb-2">Welcome Back</h1>
+            <p class="text-slate-400 text-sm">Sign in to continue your career journey.</p>
+        </div>
+
+        <form method="post" class="django-form-wrapper">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center">
+                    Invalid username or password. Please try again.
+                </div>
+            {% endif %}
+
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
+
+            <div class="flex justify-between items-center mb-6 mt-2">
+                <span></span> <!-- Spacer -->
+                <a href="{% url 'password_reset' %}" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="w-full py-3 px-4 font-semibold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl transition duration-200 shadow-lg shadow-indigo-600/20 active:scale-[0.98]">
+                Sign In to Portal
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-800/60 text-center text-sm text-slate-400">
+            New to CareerDNA? 
+            <a href="{% url 'signup' %}" class="text-indigo-400 hover:text-indigo-300 font-medium transition ml-1 inline-block underline underline-offset-4">Create an account</a>
+        </div>
+    </div>
+
+    <style>
+        .django-form-wrapper p { margin-bottom: 1.25rem; position: relative; }
+        .django-form-wrapper label { display: block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 0.5rem; }
+        .django-form-wrapper input { width: 100%; background-color: #0B0F19; border: 1px solid #334155; padding: 0.75rem 1rem; border-radius: 0.75rem; color: #E2E8F0; font-size: 0.95rem; transition: all 0.2s; }
+        .django-form-wrapper input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15); }
+        .django-form-wrapper .helptext { display: none !important; }
+    </style>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

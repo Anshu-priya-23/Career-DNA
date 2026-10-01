@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerDNA — Initialize Neural Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0B0F19] text-slate-200 font-sans min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div class="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none"></div>
+
+    <div class="w-full max-w-md p-8 mx-4 bg-[#151D30]/60 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl relative z-10">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
+                CareerDNA
+            </h1>
+            <p class="text-slate-400 text-sm mt-2">Initialize Your Intelligence Profile</p>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="space-y-2 text-slate-300">
+                <div class="django-form-wrapper" id="authFormWrapper">
+                    {{ form.as_p }}
+                </div>
+            </div>
+
+            <button type="submit" class="w-full mt-4 py-3 px-4 font-semibold text-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl transition duration-200 shadow-lg shadow-purple-600/20 active:scale-[0.98]">
+                Build Digital Profile
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-800/60 text-center text-sm text-slate-400">
+            Already registered? 
+            <a href="{% url 'login' %}" class="text-purple-400 hover:text-purple-300 font-medium transition ml-1 underline underline-offset-4">Sign in here</a>
+        </div>
+    </div>
+
+    <style>
+        .django-form-wrapper p { margin-bottom: 1rem; position: relative; }
+        .django-form-wrapper label { display: block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 0.25rem; }
+        .django-form-wrapper input { width: 100%; background-color: #0B0F19; border: 1px solid #334155; padding: 0.75rem 2.5rem 0.75rem 1rem; border-radius: 0.75rem; color: #E2E8F0; font-size: 0.95rem; transition: all 0.2s; }
+        .django-form-wrapper input:focus { outline: none; border-color: #A855F7; box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15); }
+        .django-form-wrapper .helptext { display: block; font-size: 0.75rem; color: #64748B; margin-top: 0.25rem; line-height: 1.2; }
+        .django-form-wrapper ul { font-size: 0.75rem; color: #FDA4AF; list-style-type: disc; padding-left: 1rem; margin-top: 0.25rem; }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordInputs = document.querySelectorAll('#authFormWrapper input[type="password"]');
+            
+            passwordInputs.forEach(input => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative w-full';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                const toggleBtn = document.createElement('button');
+                toggleBtn.type = 'button';
+                toggleBtn.className = 'absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition focus:outline-none';
+                toggleBtn.innerHTML = '<i data-lucide="eye" class="w-5 h-5"></i>';
+                wrapper.appendChild(toggleBtn);
+
+                toggleBtn.addEventListener('click', function() {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        toggleBtn.innerHTML = '<i data-lucide="eye-off" class="w-5 h-5"></i>';
+                    } else {
+                        input.type = 'password';
+                        toggleBtn.innerHTML = '<i data-lucide="eye" class="w-5 h-5"></i>';
+                    }
+                    lucide.createIcons();
+                });
+            });
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
