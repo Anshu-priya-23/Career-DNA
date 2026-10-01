@@ -1,228 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerDNA — Intelligence Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="bg-[#0B0F19] text-slate-200 font-sans min-h-screen relative overflow-x-hidden">
-    <div class="fixed top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-indigo-900/20 blur-[150px] pointer-events-none"></div>
-    <div class="fixed bottom-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-blue-900/10 blur-[150px] pointer-events-none"></div>
-
-    <nav class="w-full border-b border-slate-800 bg-[#0B0F19]/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                CareerDNA
-            </h1>
-            <div class="flex items-center gap-6">
-                <span class="text-sm text-slate-400 font-medium flex items-center gap-2">
-                    <i data-lucide="user" class="w-4 h-4"></i>
-                    @{{ request.user.username }}
-                </span>
-                <form action="{% url 'logout' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <button type="submit" class="text-xs px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition font-semibold border border-red-500/20 flex items-center gap-2">
-                        <i data-lucide="power" class="w-3 h-3"></i>
-                        Log Out
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-white mb-2">Core Profile Initialization</h2>
-            <p class="text-slate-400">Define your baseline metrics to calibrate the AI career tracking systems.</p>
-        </div>
-
-        <div class="bg-[#151D30]/60 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mb-6 p-4 rounded-xl text-sm font-medium border bg-emerald-500/10 border-emerald-500/20 text-emerald-400 flex items-center gap-3 animate-pulse">
-                        <i data-lucide="check-circle" class="w-5 h-5"></i>
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <h3 class="text-lg font-semibold text-indigo-300 mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
-                <i data-lucide="database" class="w-5 h-5"></i>
-                Academic, Career & Document Targets
-            </h3>
-
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="django-form-wrapper grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                    {{ form.as_p }}
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-slate-800 flex justify-between items-center">
-                    <button type="submit" 
-        name="analyze_gap" 
-        onclick="showLoading()" 
-        class="bg-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-indigo-500 transition">
-    Analyze Skill Gap
-</button>
-<div id="loading-overlay" class="hidden fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md">
-    <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-    <h2 class="text-2xl font-bold text-white mb-2">Analyzing your potential...</h2>
-    <p class="text-slate-400">Our AI is mapping your career trajectory against industry standards.</p>
-</div>
-                    <button type="submit" class="py-3 px-8 font-semibold text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl transition duration-200 shadow-lg shadow-indigo-600/20 active:scale-[0.98] flex items-center gap-2">
-                        <i data-lucide="save" class="w-4 h-4"></i>
-                        Synchronize Profile Data
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        {% if profile.skills %}
-        <div class="mt-8 bg-[#151D30]/60 backdrop-blur-xl border border-indigo-500/30 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
-            <h3 class="text-lg font-semibold text-indigo-300 mb-4 flex items-center gap-2">
-                <i data-lucide="brain-circuit" class="w-5 h-5 text-indigo-400"></i>
-                AI Career Intelligence
-            </h3>
-            <div id="skills-container" class="flex flex-wrap gap-2 p-4 bg-[#090D14] border border-slate-700/50 rounded-xl" data-raw-skills="{{ profile.skills }}">
-                <span class="text-slate-500 text-sm italic">Processing skills...</span>
-            </div>
-        </div>
-        {% endif %}
-    </main>
-
-    {% if missing_skills_list %}
-    <div id="gap-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-[#151D30] border border-indigo-500/30 rounded-2xl shadow-2xl p-8 max-w-lg w-full relative">
-            <button onclick="document.getElementById('gap-modal').style.display='none'" class="absolute top-4 right-4 text-slate-500 hover:text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <h3 class="text-indigo-300 font-bold mb-4 flex items-center gap-2">
-                <i data-lucide="target" class="w-5 h-5"></i> Strategic Skill Gap Analysis
-            </h3>
-            <p class="text-sm text-slate-400 mb-6">Target: <strong>{{ profile.dream_role }}</strong> at <strong>{{ profile.dream_company }}</strong></p>
-            
-            <div class="flex items-center justify-between mb-6 p-4 bg-[#0B0F19] rounded-xl border border-indigo-500/20">
-                <span class="text-slate-400 text-sm">Resume Match Score:</span>
-                <span class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-                    {{ profile.resume_score }}
-                </span>
-            </div>
-
-            <div class="mb-6">
-    <span class="block text-xs uppercase text-slate-500 font-bold mb-3">
-        Interactive Learning Roadmap
-    </span>
-
-    <div class="space-y-3">
-
-        {% for task in profile.roadmap_tasks.all %}
-
-        <div class="bg-[#0B0F19] border border-slate-700 rounded-xl p-4 flex items-center justify-between">
-
-            <div class="flex items-center gap-3">
-
-                <input
-                    type="checkbox"
-                    {% if task.is_completed %}checked{% endif %}
-                    onchange="updateTask({{ task.id }}, this.checked)"
-                    class="w-5 h-5 accent-indigo-600 cursor-pointer"
-                >
-
-                <span class="text-sm transition-all duration-200 {% if task.is_completed %}line-through text-slate-500{% else %}text-indigo-200{% endif %}">
-                    {{ task.task_description }}
-                </span>
-
-            </div>
-
-        </div>
-
-        {% empty %}
-
-        <p class="text-slate-500 text-sm">
-            No roadmap generated yet.
-        </p>
-
-        {% endfor %}
-
-    </div>
-</div>
-            <div>
-                <span class="block text-xs uppercase text-slate-500 font-bold mb-2">Technology Gaps</span>
-                <div class="flex flex-wrap gap-2">
-                    {% for skill in missing_skills_list %}
-                        <span class="px-3 py-1 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-full">{{ skill }}</span>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <style>
-        .django-form-wrapper p { position: relative; margin-bottom: 0; }
-        .django-form-wrapper label { display: block; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94A3B8; margin-bottom: 0.4rem; }
-        .django-form-wrapper input, .django-form-wrapper select { width: 100%; background-color: #090D14; border: 1px solid #334155; padding: 0.75rem 1rem; border-radius: 0.75rem; color: #E2E8F0; font-size: 0.95rem; transition: all 0.2s; }
-        .django-form-wrapper input:focus, .django-form-wrapper select:focus { outline: none; border-color: #4F46E5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15); }
-        .django-form-wrapper input[type="file"] { padding: 0.5rem; cursor: pointer; }
-        .django-form-wrapper p:nth-child(6), .django-form-wrapper p:nth-child(7), .django-form-wrapper p:nth-child(8) { grid-column: 1 / -1; }
-        .django-form-wrapper .helptext { display: none !important; }
-    </style>
-
-    <script>
-        function showLoading() {
-        document.getElementById('loading-overlay').classList.remove('hidden');
-    }
-        function updateTask(taskId, isChecked) {
-
-    fetch(`/update-task/${taskId}/`, {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-
-        body: JSON.stringify({
-            completed: isChecked
-        })
-
-    })
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        console.log(data);
-
-        location.reload();
-
-    })
-
-    .catch(error => console.error(error));
-
-}
-        document.addEventListener("DOMContentLoaded", function() {
-            lucide.createIcons();
-            const container = document.getElementById('skills-container');
-            if (container) {
-                let rawSkills = container.getAttribute('data-raw-skills');
-                rawSkills = rawSkills.replace(/[\[\]'"]/g, '');
-                const skillsArray = rawSkills.split(',').filter(s => s.trim().length > 0);
-                if (skillsArray.length > 0) {
-                    container.innerHTML = '';
-                    skillsArray.forEach(skill => {
-                        const badge = document.createElement('span');
-                        badge.className = "px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold rounded-full tracking-wide";
-                        badge.textContent = skill.trim();
-                        container.appendChild(badge);
-                    });
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+{% extends 'accounts/base.html' %}
+{% block title %}Resume review | CareerDNA{% endblock %}
+{% block content %}
+<h1>A clearer resume. A practical next step.</h1><p class="muted">Review your resume for a job, then choose whether to build the skills you need.</p>
+<div class="steps"><span>1. Review your resume</span><span>2. Create a plan (optional)</span></div>
+{% for message in messages %}<p role="alert" class="status {{ message.tags }}">{{ message }}</p>{% endfor %}
+<p id="request-state" class="status" role="status" aria-live="polite"></p>
+<section class="card" aria-labelledby="review-heading"><p class="eyebrow">Step 1</p><h2 id="review-heading">Resume review</h2>
+<form method="post" enctype="multipart/form-data" class="generation" data-loading="Reviewing your resume... Your saved results will stay safe if this request fails.">{% csrf_token %}{{ form.non_field_errors }}
+{% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>{% endfor %}
+{% if profile.resume %}<p class="muted">You can reuse your <a href="{% url 'resume' %}">saved resume</a>, or upload a new PDF.</p>{% endif %}
+<p class="muted"><small>Use a readable PDF, up to 10 MB. Your resume text and job description are sent to Gemini for this review.</small></p>
+<button name="action" value="analyze">Review my resume</button></form></section>
+{% if assessment %}
+<section class="card" aria-labelledby="improvements-heading"><p class="eyebrow">Your review &middot; {{ assessment.role }}</p><h2 id="improvements-heading">What to improve</h2>
+<p class="muted">Only use suggested wording when it is factually accurate. Replace brackets with verified details.</p>
+{% for item in edits %}<article class="improvement"><h3>{{ item.section }}</h3><p><strong>Issue:</strong> {{ item.issue }}</p><p><strong>Before</strong></p><blockquote>{{ item.before|default:'Not present in the resume.' }}</blockquote><p><strong>Suggested wording, only if accurate</strong></p><blockquote>{{ item.after }}</blockquote><p class="muted">{{ item.condition }}</p></article>{% empty %}<p>No specific edits are justified by the saved review.</p>{% endfor %}
+{% if marks_notice %}<p class="muted">{{ marks_notice }}</p>{% endif %}</section>
+{% if gaps %}<section class="card" aria-labelledby="gaps-heading"><h2 id="gaps-heading">Skills to strengthen or show more clearly</h2><p>Already know it? Add supporting evidence to your resume.<br>Do not know it? Include it in the learning plan.</p><p>{% for item in gaps %}<strong>{{ item.skill }}</strong>{% if item.optional %} (preferred){% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p></section>{% endif %}
+<section class="card" aria-labelledby="plan-heading"><p class="eyebrow">Step 2 &middot; Optional</p><h2 id="plan-heading">Do you want to build the skills needed for this job role?</h2>
+<a class="button" id="create-plan" href="?plan=1#learning-inputs" aria-expanded="{% if plan_open %}true{% else %}false{% endif %}" aria-controls="learning-inputs">Yes, create my plan</a>
+<div id="learning-inputs" {% if not plan_open %}hidden{% endif %}><h3 style="margin-top:24px">What do you already know?</h3><p class="muted">Tick skills you can use independently. They will be left out of the learning plan.</p>
+<form method="post" class="generation" data-loading="Creating your learning plan... Your previous plan and progress stay safe if this request fails.">{% csrf_token %}{{ roadmap_form.non_field_errors }}
+{% for field in roadmap_form %}{% if field.name != 'days' and field.name != 'hours_per_day' %}<label class="known" for="{{ field.id_for_label }}">{{ field }}{{ field.label }}</label>{{ field.errors }}{% endif %}{% endfor %}
+{% if not gaps %}<p>No skill gaps to plan for. You can keep your previous checklist below.</p>{% endif %}
+<div class="grid"><div class="field">{{ roadmap_form.days.label_tag }}{{ roadmap_form.days }}{{ roadmap_form.days.errors }}</div><div class="field">{{ roadmap_form.hours_per_day.label_tag }}{{ roadmap_form.hours_per_day }}{{ roadmap_form.hours_per_day.errors }}</div></div>
+<button name="action" value="roadmap">Generate my plan</button></form></div></section>
+{% endif %}
+{% if roadmap %}<section class="card" aria-labelledby="timeline-heading"><h2 id="timeline-heading">Your learning checklist</h2><p class="muted">For {{ roadmap.role }} &middot; {{ roadmap.planned_hours }} of {{ roadmap.budget }} available hours</p>{% if plan_stale %}<p class="status">This checklist is from an earlier review. Create a new plan when you are ready; your previous progress is preserved.</p>{% endif %}<p id="progress-label"></p><progress id="progress" value="0" max="1"></progress>
+<ol class="timeline">{% for phase, task in phase_tasks %}<li><label class="task-label"><input type="checkbox" class="task" data-url="{% url 'update_task' task.id %}" {% if task.is_completed %}checked{% endif %} aria-label="Complete {{ phase.title }}"><span class="task-body"><small>Days {{ phase.start_day }}&ndash;{{ phase.end_day }} &middot; {{ phase.total_hours }} hours</small><h3>{{ phase.title }}</h3><p>{{ phase.exercise }}</p><small>Done when: {{ phase.checkpoint }}</small></span></label></li>{% empty %}<li>No learning tasks scheduled.</li>{% endfor %}</ol>
+{% if roadmap.deferred %}<h3 style="margin-top:24px">Needs more time</h3><p class="muted">These topics could not fit, or depend on a topic that could not fit. Increase your time budget to include them.</p>{% for item in roadmap.deferred %}<p><strong>{{ item.title }}</strong> &middot; {{ item.hours }} hours</p>{% endfor %}{% endif %}<p class="muted">{{ roadmap.warning }}</p></section>
+{% elif profile.roadmap_tasks.exists %}<section class="card"><h2>Previous saved checklist</h2>{% for task in profile.roadmap_tasks.all %}<label class="known"><input type="checkbox" class="task" data-url="{% url 'update_task' task.id %}" {% if task.is_completed %}checked{% endif %}>{{ task.task_description }}</label>{% endfor %}</section>{% endif %}
+{% endblock %}
+{% block scripts %}<script>
+const state=document.getElementById('request-state');
+const create=document.getElementById('create-plan');
+if(create)create.addEventListener('click',event=>{event.preventDefault();const inputs=document.getElementById('learning-inputs');inputs.hidden=false;create.setAttribute('aria-expanded','true');inputs.scrollIntoView({behavior:'smooth',block:'start'});inputs.querySelector('input')?.focus({preventScroll:true});});
+for(const form of document.querySelectorAll('form.generation'))form.addEventListener('submit',event=>{if(form.dataset.busy){event.preventDefault();return;}form.dataset.busy='1';form.setAttribute('aria-busy','true');state.textContent=form.dataset.loading;state.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>form.querySelectorAll('button').forEach(b=>b.disabled=true),0);setTimeout(()=>{state.textContent='This is taking longer than usual. You can reload and retry; your saved results are preserved.';},130000);});
+window.addEventListener('pageshow',()=>{document.querySelectorAll('form.generation').forEach(f=>{f.dataset.busy='';f.removeAttribute('aria-busy');f.querySelectorAll('button').forEach(b=>b.disabled=false);});});
+function progress(){const tasks=[...document.querySelectorAll('.task')],done=tasks.filter(t=>t.checked).length,bar=document.getElementById('progress');if(bar){bar.max=tasks.length||1;bar.value=done;document.getElementById('progress-label').textContent=`${done} of ${tasks.length} tasks completed`;}}
+for(const checkbox of document.querySelectorAll('.task'))checkbox.addEventListener('change',async()=>{checkbox.disabled=true;try{const response=await fetch(checkbox.dataset.url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':document.querySelector('[name=csrfmiddlewaretoken]').value},body:JSON.stringify({completed:checkbox.checked}),signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error();const data=await response.json();if(data.status!=='success')throw Error();state.textContent='Progress saved.';}catch{checkbox.checked=!checkbox.checked;state.textContent='Progress could not be saved. Please retry the checkbox.';}finally{checkbox.disabled=false;progress();}});progress();
+</script>{% endblock %}

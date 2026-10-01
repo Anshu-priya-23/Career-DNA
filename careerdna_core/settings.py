@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env', override=False)
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,6 +29,7 @@ SECRET_KEY = 'django-insecure-je6lff&6d(((3rq%t4@n7d0^u=0_0vogs($(0ey*&ji$oj95k*
 DEBUG = True
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 
 
 # Application definition
@@ -86,6 +90,10 @@ DATABASES = {
 
 
 # Password validation
+for field in ('NAME', 'USER', 'PASSWORD', 'HOST', 'PORT'):
+    DATABASES['default'][field] = os.getenv('DB_' + field, DATABASES['default'][field])
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', SECRET_KEY)
+DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() == 'true'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [

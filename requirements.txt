@@ -1,0 +1,6 @@
+Django>=6.0,<6.1
+PyMuPDF>=1.26,<2
+pydantic>=2.12,<3
+google-genai>=2.26,<3
+python-dotenv>=1.2,<2
+psycopg2-binary>=2.9,<3
